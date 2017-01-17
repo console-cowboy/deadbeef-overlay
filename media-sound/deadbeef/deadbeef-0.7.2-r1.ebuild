@@ -13,7 +13,7 @@ inherit autotools fdo-mime gnome2-utils l10n versionator
 
 SRC_URI="mirror://sourceforge/${PN}/${P}.tar.bz2"
 
-KEYWORDS="~amd64 ~x86"
+KEYWORDS="~amd64 ~x86 ~x64-macos"
 
 DESCRIPTION="foobar2k-like music player"
 HOMEPAGE="http://deadbeef.sourceforge.net"
@@ -136,6 +136,8 @@ DEPEND="${RDEPEND}
 S="${WORKDIR}/${P}"
 
 src_prepare() {
+	cp -v "${FILESDIR}/retina.h" "${S}/plugins/gtkui"
+
 	if ! use_if_iuse linguas_pt_BR && use_if_iuse linguas_ru ; then
 		eapply "${FILESDIR}/${PN}-remove-pt_br-help-translation.patch"
 		rm -v "${S}/translation/help.pt_BR.txt" || die
@@ -162,6 +164,8 @@ src_prepare() {
 		eapply "${FILESDIR}/${PN}-0.7.2-remove-unity-trash.patch"
 	fi
 
+	eapply "${FILESDIR}/patch-junklib.c"
+
 	eapply_user
 
 	config_rpath_update "${S}/config.rpath"
@@ -169,7 +173,7 @@ src_prepare() {
 }
 
 src_configure() {
-	econf --disable-coreaudio \
+	econf --enable-coreaudio \
 		--disable-portable \
 		--disable-static \
 		$(use_enable aac) \
